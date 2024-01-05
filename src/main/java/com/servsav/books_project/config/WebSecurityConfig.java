@@ -23,15 +23,17 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/register/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/about").permitAll()
                 .antMatchers("/index").permitAll()
+                .antMatchers("/users").hasAnyRole("ROLE_ADMIN","ADMIN")
                 .anyRequest().authenticated()
-                //   .antMatchers("/users").hasRole("ADMIN")
+
                 .and()
                 .formLogin(
                         form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/users")
+                                .defaultSuccessUrl("/list-books")
                                 .permitAll()
                 ).logout(
                         logout -> logout

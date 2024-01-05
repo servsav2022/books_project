@@ -1,4 +1,5 @@
 package com.servsav.books_project.service;
+
 import com.servsav.books_project.dto.UserDto;
 import com.servsav.books_project.entity.Role;
 import com.servsav.books_project.entity.User;
@@ -8,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImplementation implements UserService {
 
@@ -56,6 +57,10 @@ public class UserServiceImplementation implements UserService {
         userDto.setFirstName(str[0]);
         userDto.setLastName(str[1]);
         userDto.setEmail(user.getEmail());
+        List<String> roleNames = user.getRoles()
+                .stream().map(Role::getName)
+                .collect(Collectors.toList());
+        userDto.setRoles(roleNames);
         return userDto;
     }
     private Role checkRoleExist() {

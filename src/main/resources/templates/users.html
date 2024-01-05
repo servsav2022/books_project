@@ -9,22 +9,93 @@
           rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
+    <style>
+        /* Кастомные стили для страницы */
+        body {
+            padding-top: 0px; /* Задаем отступ для фиксированного верхнего меню */
+            margin: 0; /* Убираем внешний отступ для body */
+        }
+        @media (max-width: 1200px) {
+            /* Стили для экранов шириной не более 1200px */
+            .container, .navbar {
+                max-width: 100%;
+            }
+            .navbar {
+                padding: 0;
+            }
+            .navbar-nav {
+                margin-left: auto; /* Сдвигаем элементы меню вправо */
+            }
+            .navbar-nav .nav-item {
+                margin-right: 10px; /* Расстояние между элементами меню */
+            }
+        }
+        @media (max-width: 720px) {
+            /* Стили для экранов шириной не более 720px */
+            .container {
+                max-width: 100%;
+            }
+        }
+        .navbar {
+            background-color: white; /* Цвет фона верхнего меню */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Тень */
+        }
+        .navbar-toggler-icon {
+            background-color: black; /* Цвет иконки бургер-меню */
+        }
+        .navbar-toggle {
+            border-color: black; /* Цвет границы бургер-меню */
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: white; /* Цвет текста кнопок меню */
+        }
+        .navbar-dark .navbar-toggler-icon {
+            background-color: darkgrey; /* Цвет иконки бургер-меню в темном верхнем меню */
+        }
+        .navbar-toggle {
+            background-color: darkgrey; /* Цвет кнопки бургер-меню в темном верхнем меню */
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/index}">Registration and Login System</a>
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/index}">Books Management System</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" th:href="@{/logout}">Logout</a>
+                <!-- Проверка, аутентифицирован ли пользователь -->
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/list-books}">My Books</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" th:href="@{/list-books}">Books</a>
+                    <a class="nav-link" th:href="@{/about}">О приложении</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()') and
+                 #authorization.expression('hasRole(''ADMIN'') or hasRole(''ROLE_ADMIN'') ')}">
+                    <a class="nav-link" th:href="@{/users}">Users</a>
+                </li>
+                <!-- Если аутентификация не выполнена, показать ссылки на вход и регистрацию -->
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/register}">Register</a>
+                </li>
+                <!-- Если аутентификация выполнена, показать имя пользователя и кнопку "Logout" -->
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <span class="nav-link" th:text="${#authentication.name}"></span>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="nav-link btn btn-link">Logout</button>
+                    </form>
                 </li>
             </ul>
         </div>
@@ -40,6 +111,8 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th> <!-- Добавьте новую колонку для действий -->
         </tr>
         </thead>
         <tbody>
@@ -47,6 +120,23 @@
             <td th:text="${user.firstName}"></td>
             <td th:text="${user.lastName}"></td>
             <td th:text="${user.email}"></td>
+            <td>
+                <ul>
+                    <li th:each="role : ${user.roles}" th:text="${role}"></li>
+                </ul>
+            </td>
+            <!-- Форма для изменения ролей -->
+            <td>
+                <form th:action="@{/users}" method="get">
+                    <input type="hidden" name="userId" th:value="${user.id}" />
+
+                    <select name="roles" multiple="multiple">
+                        <option th:each="role : ${roles}" th:value="${role}"
+                                th:selected="${userRoleNames.contains(role)}"></option>
+                    </select>
+                    <button type="submit">Update Roles</button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>

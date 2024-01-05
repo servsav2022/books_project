@@ -43,7 +43,7 @@
         .navbar-toggler-icon {
             background-color: black; /* Цвет иконки бургер-меню */
         }
-        .navbar-toggle {
+        .navbar-toggler {
             border-color: black; /* Цвет границы бургер-меню */
         }
         .navbar-dark .navbar-nav .nav-link {
@@ -52,7 +52,7 @@
         .navbar-dark .navbar-toggler-icon {
             background-color: darkgrey; /* Цвет иконки бургер-меню в темном верхнем меню */
         }
-        .navbar-toggle {
+        .navbar-toggler {
             background-color: darkgrey; /* Цвет кнопки бургер-меню в темном верхнем меню */
         }
     </style>
@@ -76,6 +76,10 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()') and
+                 #authorization.expression('hasRole(''ADMIN'') or hasRole(''ROLE_ADMIN'') ')}">
+                    <a class="nav-link" th:href="@{/users}">Users</a>
+                </li>
                 <!-- Если аутентификация не выполнена, показать ссылки на вход и регистрацию -->
                 <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link" th:href="@{/login}">Login</a>
@@ -99,57 +103,17 @@
 <br/><br/>
 <div class="container">
     <div class="row">
-        <div class="col-md-6 offset-md-3">
-
-            <div th:if="${param.error}">
-                <div class="alert alert-danger">Invalid Email or Password</div>
-            </div>
-            <div th:if="${param.logout}">
-                <div class="alert alert-success"> You have been logged out.</div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center">Login Form</h2>
-                </div>
-                <div class="card-body">
-                    <form
-                            method="post"
-                            role="form"
-                            th:action="@{/login}"
-                            class="form-horizontal"
-                    >
-                        <div class="form-group mb-3">
-                            <label class="control-label"> Email</label>
-                            <input
-                                    type="text"
-                                    id="username"
-                                    name="username"
-                                    class="form-control"
-                                    placeholder="Enter email address"
-                            />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="control-label"> Password</label>
-                            <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    class="form-control"
-                                    placeholder="Enter password"
-                            />
-                        </div>
-                        <div class="form-group mb-3">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <span> Not registered ?
-                                <a th:href="@{/register}">Register/Signup here</a>
-                            </span>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <h1 class="text-center"> Система управления книгами </h1>
+        <br>
+        <h3 class="text-center">Курсовой проект студента группы РИВ-220908у</h3>
+        <h3 class="text-center">Выполнил Свалухин Александр Владимирович</h3>
+        <h3 class="text-center">Проект написан на Java SpringBoot 2.7.18-SNAPSHOT</h3>
+        <h3 class="text-center">Использовалась PostgreSQL 16.1</h3>
+        <h3 class="text-center">Использовалась graalvm-jdk-17.0.9</h3>
+        <h3 class="text-center">Использовалась thymeleaf</h3>
+        <h3 class="text-center">Использовалась spring-security</h3>
+        <h3 class="text-center">Использовалась actuator</h3>
+        <h3 class="text-center">Использовалась lombok</h3>
     </div>
 </div>
 </body>
