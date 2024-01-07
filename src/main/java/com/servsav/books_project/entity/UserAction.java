@@ -6,38 +6,28 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "books")
-public class Book {
+@Table(name = "useractions")
+public class UserAction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "data_time")
+    private LocalDateTime currentLocalDateTime;
 
-    @Column(name = "author")
-    private String author;
-
-    @Column(name = "year")
-    private int year;
-
-    @Column(name = "pageCount")
-    private int pageCount;
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id") // Имя столбца, который будет хранить внешний ключ
     private User user;
-
-    @OneToOne
-    @JoinColumn(name = "book_id", referencedColumnName = "id") // Имя столбца, который будет хранить внешний ключ
-    private PriceBook priceBook;
-
 }

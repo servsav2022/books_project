@@ -71,6 +71,9 @@
                 <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link" th:href="@{/list-books}">My Books</a>
                 </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/list-shops}">My Shops</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/about}">О приложении</a>
                 </li>
@@ -78,7 +81,7 @@
             <ul class="navbar-nav">
                 <!-- Если аутентификация выполнена и пользователь имеет определенные роли, показать ссылку на страницу /users -->
                 <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()') and
-                 #authorization.expression('hasRole(''ADMIN'') or hasRole(''ROLE_ADMIN'') ')}">
+                 #authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="nav-link" th:href="@{/users}">Users</a>
                 </li>
 

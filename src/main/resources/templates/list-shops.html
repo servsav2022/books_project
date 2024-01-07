@@ -43,7 +43,7 @@
         .navbar-toggler-icon {
             background-color: black; /* Цвет иконки бургер-меню */
         }
-        .navbar-toggler {
+        .navbar-toggle {
             border-color: black; /* Цвет границы бургер-меню */
         }
         .navbar-dark .navbar-nav .nav-link {
@@ -52,7 +52,7 @@
         .navbar-dark .navbar-toggler-icon {
             background-color: darkgrey; /* Цвет иконки бургер-меню в темном верхнем меню */
         }
-        .navbar-toggler {
+        .navbar-toggle {
             background-color: darkgrey; /* Цвет кнопки бургер-меню в темном верхнем меню */
         }
     </style>
@@ -103,27 +103,47 @@
         </div>
     </div>
 </nav>
-<br/><br/>
-<div class="container">
-    <div class="row">
-        <h1 class="text-center"> Система управления книгами </h1>
-        <br>
-        <h3 class="text-center">Курсовой проект студента группы РИВ-220908у</h3>
-        <h3 class="text-center">Выполнил Свалухин Александр Владимирович</h3>
-        <h3 class="text-center"><a href="https://github.com/servsav2022/books_project">https://github.com/servsav2022/books_project</a></h3>
-        <hr>
-        <br><br>
-        <h3 class="text-center">Проект написан на Java SpringBoot 2.7.18-SNAPSHOT</h3>
-        <h3 class="text-center">Использовалась PostgreSQL 16.1</h3>
-        <h3 class="text-center">Использовалась graalvm-jdk-17.0.9</h3>
-        <h3 class="text-center">Использовалась thymeleaf</h3>
-        <h3 class="text-center">Использовалась spring-security</h3>
-        <h3 class="text-center">Использовалась actuator</h3>
-        <h3 class="text-center">Использовалась lombok</h3>
-        <h3 class="text-center">Использовалась logback-clasic-1.4.14</h3>
-        <h3 class="text-center">Использовалась slf4j-api-2.0.7</h3>
+<div class="container col-md-6">
 
-    </div>
+    <hr/>
+    <a th:href="@{/addShopForm}" class="btn btn-primary">Add shop</a>
+    <br/><br/>
+    <table class="table table-bordered table-striped " id="shopTable">
+        <thead>
+        <tr>
+            <th>название магазина</th>
+            <th>адрес</th>
+            <th>телефон</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="shop: ${shops}">
+            <td th:text="${shop.title}" />
+            <td th:text="${shop.address}" />
+            <td th:text="${shop.tel}" />
+            <td>
+                <a th:href="@{/showUpdateShopForm(shopId=${shop.id})}" class="btn btn-info">Update</a>
+
+                <a th:href="@{/deleteShop(shopId=${shop.id})}" class="btn btn-danger ml-2">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+
 </div>
-</body>
-</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#shopTable").DataTable({
+            'aoColumnDefs': [{
+                'bSortable': false,
+                'aTargets': [-1] /* 1st one, start by the right */
+            }]
+        });
+    })
+
+</script>
+</body></html>

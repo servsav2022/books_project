@@ -43,7 +43,7 @@
         .navbar-toggler-icon {
             background-color: black; /* Цвет иконки бургер-меню */
         }
-        .navbar-toggler {
+        .navbar-toggle {
             border-color: black; /* Цвет границы бургер-меню */
         }
         .navbar-dark .navbar-nav .nav-link {
@@ -52,7 +52,7 @@
         .navbar-dark .navbar-toggler-icon {
             background-color: darkgrey; /* Цвет иконки бургер-меню в темном верхнем меню */
         }
-        .navbar-toggler {
+        .navbar-toggle {
             background-color: darkgrey; /* Цвет кнопки бургер-меню в темном верхнем меню */
         }
     </style>
@@ -79,10 +79,6 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
-                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()') and
-                 #authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link" th:href="@{/users}">Users</a>
-                </li>
                 <!-- Если аутентификация не выполнена, показать ссылки на вход и регистрацию -->
                 <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link" th:href="@{/login}">Login</a>
@@ -103,27 +99,32 @@
         </div>
     </div>
 </nav>
-<br/><br/>
 <div class="container">
-    <div class="row">
-        <h1 class="text-center"> Система управления книгами </h1>
-        <br>
-        <h3 class="text-center">Курсовой проект студента группы РИВ-220908у</h3>
-        <h3 class="text-center">Выполнил Свалухин Александр Владимирович</h3>
-        <h3 class="text-center"><a href="https://github.com/servsav2022/books_project">https://github.com/servsav2022/books_project</a></h3>
-        <hr>
-        <br><br>
-        <h3 class="text-center">Проект написан на Java SpringBoot 2.7.18-SNAPSHOT</h3>
-        <h3 class="text-center">Использовалась PostgreSQL 16.1</h3>
-        <h3 class="text-center">Использовалась graalvm-jdk-17.0.9</h3>
-        <h3 class="text-center">Использовалась thymeleaf</h3>
-        <h3 class="text-center">Использовалась spring-security</h3>
-        <h3 class="text-center">Использовалась actuator</h3>
-        <h3 class="text-center">Использовалась lombok</h3>
-        <h3 class="text-center">Использовалась logback-clasic-1.4.14</h3>
-        <h3 class="text-center">Использовалась slf4j-api-2.0.7</h3>
 
+    <hr/>
+    <h3>Добавление нового книжного</h3>
+    <hr/>
+    <div class="row">
+        <div class="col-md-4 offset-md-3">
+            <div class="mx-auto">
+    <form th:action="@{/saveShop}" th:object="${shop}" method="POST">
+
+        <input type="text" th:field="*{title}" class="form-control col-4 mb-4" placeholder="название магазина"/>
+
+        <input type="text" th:field="*{address}" class="form-control col-4 mb-4" placeholder="адресс"/>
+
+        <input type="text" th:field="*{tel}" class="form-control col-4 mb-4" placeholder="телефон"/>
+
+        <button type="submit" class="btn btn-primary col-2">Save</button>
+
+        <input type="hidden" th:field="*{id}"/>
+
+    </form>
+            </div>
+        </div>
     </div>
+    <hr/>
+    <a th:href="@{/list-books}">Назад к просмотру списка книжных</a>
 </div>
 </body>
 </html>

@@ -71,6 +71,9 @@
                 <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link" th:href="@{/list-books}">My Books</a>
                 </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/list-shops}">My Shops</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/about}">О приложении</a>
                 </li>
@@ -99,7 +102,7 @@
 <div class="container">
 
     <hr/>
-    <h3>Add New Book</h3>
+    <h3>Добавление новой книги</h3>
     <hr/>
     <div class="row">
         <div class="col-md-4 offset-md-3">
@@ -113,6 +116,8 @@
         <input type="text" th:field="*{year}" class="form-control col-4 mb-4" placeholder="год"/>
 
         <input type="text" th:field="*{pageCount}" class="form-control col-4 mb-4" placeholder="кол-во страниц"/>
+
+        <input type="text" th:field="*{priceBook.price}" class="form-control col-4 mb-4" placeholder="цена книги"/>
 
         <button type="submit" class="btn btn-primary col-2">Save</button>
 

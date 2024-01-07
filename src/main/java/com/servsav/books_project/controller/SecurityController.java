@@ -3,25 +3,30 @@ package com.servsav.books_project.controller;
 import com.servsav.books_project.dto.UserDto;
 import com.servsav.books_project.entity.Role;
 import com.servsav.books_project.entity.User;
+import com.servsav.books_project.repository.RoleRepository;
 import com.servsav.books_project.repository.UserRepository;
 import com.servsav.books_project.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 public class SecurityController {
     private UserService userService;
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
     public SecurityController(UserService userService){this.userService = userService;}
@@ -57,15 +62,50 @@ public class SecurityController {
     }
 
     @GetMapping("/users")
-    public String users(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername());
+    public String users(Model model) {
+        List<Role> roles = roleRepository.findAll();
+
         List<UserDto> users = userService.findAllUsers();
-        List<String> roleNames = user.getRoles()
+        List<String> roleNames =roles
                 .stream().map(Role::getName)
                 .collect(Collectors.toList());
         model.addAttribute("userRoleNames", roleNames);
         model.addAttribute("users", users);
         return "users";
+    }
+
+    @PostMapping("/updateRoles")
+    public String updateRoles(@RequestParam("email") String email,@RequestParam("role") String roleName) {
+
+                // Получить пользователя по email
+        User selectUser = userRepository.findByEmail(email);
+        if (selectUser == null) {
+            // Обработка случая, когда пользователь с указанной электронной почтой не найден
+            return "redirect:/users"; // или любая другая логика обработки ошибки
+        }
+
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info(selectUser.getName());
+        log.info("roleName пришедшее из запроса : "+roleName);
+        log.info("roleName пришедшее из запроса : "+roleName);
+        log.info("roleName пришедшее из запроса : "+roleName);
+        // Установить новые роли для пользователя
+        Role role=roleRepository.findByName(roleName);
+        selectUser.setRoles(Arrays.asList(role));
+
+        log.info("установлена роль: "+role.getName());
+        log.info("установлена роль: "+role.getName());
+        log.info("установлена роль: "+role.getName());
+
+        // Сохранить обновленного пользователя
+        userRepository.save(selectUser);
+        // Перенаправить на страницу с пользователями
+        return "redirect:/users";
     }
 
 }
