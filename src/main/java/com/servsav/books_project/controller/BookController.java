@@ -8,12 +8,12 @@ import com.servsav.books_project.repository.BookRepository;
 import com.servsav.books_project.repository.PriceBookRepository;
 import com.servsav.books_project.repository.RoleRepository;
 import com.servsav.books_project.repository.UserRepository;
+import com.servsav.books_project.service.UserActionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,32 +35,42 @@ public class BookController {
     private PriceBookRepository priceBookRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private UserActionService userActionService;
     @GetMapping("/list-books")
-    public ModelAndView getAllBooks(Model model, @AuthenticationPrincipal UserDetails userDetails){
+    public ModelAndView getAllBooks(@AuthenticationPrincipal UserDetails userDetails){
+
         log.info("/list-books -> connection");
         log.info(userDetails.getUsername());
         ModelAndView mav = new ModelAndView("list-books");
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
-        currentUser.getRoles();
-        Role role = roleRepository.findByName("ROLE_USER");
+        Role role = roleRepository.findByName("USER");
         if (role == currentUser.getRoles().get(0)) {
-            //получаем магазины для текущего пользователя
             List<Book> userBooks = currentUser.getBooks();
             mav.addObject("books", userBooks);
         }
         role = roleRepository.findByName("ROLE_ADMIN");
+
         if (role == currentUser.getRoles().get(0)) {
-            //получаем магазины для текущего пользователя
             List<Book> userBooks = bookRepository.findAll();
             mav.addObject("books", userBooks);
         }
+
+        role = roleRepository.findByName("READ_ONLY");
+        if (role == currentUser.getRoles().get(0)) {
+            List<Book> userBooks = currentUser.getBooks();
+            mav.addObject("books", userBooks);
+        }
+        userActionService.logUserAction(currentUser, "Просмотрел список книг: ");
         return mav;
     }
     @GetMapping("/addBookForm")
-    public ModelAndView addBookForm() {
+    public ModelAndView addBookForm(@AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
         ModelAndView mav = new ModelAndView("add-book-form");
         Book book = new Book();
         mav.addObject("book", book);
+        userActionService.logUserAction(currentUser, "добавляет книгу");
         return mav;
     }
     @PostMapping("/saveBook")
@@ -69,14 +79,18 @@ public class BookController {
         book.setUser(currentUser);
         PriceBook priceBook = book.getPriceBook();
             if (priceBook != null && priceBook.getId() == null) {
+                // сохранил цену
+                userActionService.logUserAction(currentUser,
+                        "сохранил цену книги: "+book.getPriceBook().getPrice().toString());
                 // Сущность PriceBook еще не была сохранена, сохраняем ее
                 priceBookRepository.save(priceBook);
             }
         bookRepository.save(book);
+        userActionService.logUserAction(currentUser, "сохранил книгу: "+book.getTitle());
         return "redirect:/list-books";
     }
     @GetMapping("/showUpdateForm")
-    public ModelAndView showUpdateForm (@RequestParam Long bookId) {
+    public ModelAndView showUpdateForm (@RequestParam Long bookId, @AuthenticationPrincipal UserDetails userDetails) {
         ModelAndView mav = new ModelAndView("add-book-form");
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         Book book = new Book();
@@ -84,10 +98,18 @@ public class BookController {
             book = optionalBook.get();
         }
         mav.addObject("book", book);
+        //запись действия
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+        userActionService.logUserAction(currentUser,
+                "Изменил книгу: "+bookRepository.findById(bookId).get().getTitle());
         return mav;
     }
     @GetMapping("/deleteBook")
-    public String deleteBook(@RequestParam Long bookId) {
+    public String deleteBook(@RequestParam Long bookId, @AuthenticationPrincipal UserDetails userDetails) {
+        //запись действия
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+        userActionService.logUserAction(currentUser,
+                "Удалил книгу: "+bookRepository.findById(bookId).get().getTitle());
         bookRepository.deleteById(bookId);
         return "redirect:/list-books";
     }

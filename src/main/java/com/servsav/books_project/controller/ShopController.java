@@ -6,6 +6,7 @@ import com.servsav.books_project.entity.User;
 import com.servsav.books_project.repository.RoleRepository;
 import com.servsav.books_project.repository.ShopRepository;
 import com.servsav.books_project.repository.UserRepository;
+import com.servsav.books_project.service.UserActionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,8 @@ public class ShopController {
     private ShopRepository shopRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private UserActionService userActionService;
     @GetMapping("/list-shops")
     public ModelAndView getAllShops(@AuthenticationPrincipal UserDetails userDetails) {
         log.info("/list-shops -> connection");
@@ -37,8 +40,7 @@ public class ShopController {
         ModelAndView mav = new ModelAndView("list-shops");
         // Получаем текущего пользователя
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
-        currentUser.getRoles();
-        Role role = roleRepository.findByName("ROLE_USER");
+        Role role = roleRepository.findByName("USER");
         if (role == currentUser.getRoles().get(0)) {
             //получаем магазины для текущего пользователя
             List<Shop> userShops = currentUser.getShops();
@@ -50,13 +52,16 @@ public class ShopController {
             List<Shop> userShops = shopRepository.findAll();
             mav.addObject("shops", userShops);
         }
+        userActionService.logUserAction(currentUser, "Просмотрел список магазинов: ");
         return mav;
     }
     @GetMapping("/addShopForm")
-    public ModelAndView addShopForm() {
+    public ModelAndView addShopForm(@AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
         ModelAndView mav = new ModelAndView("add-shop-form");
         Shop shop = new Shop();
         mav.addObject("shop", shop);
+        userActionService.logUserAction(currentUser, "добавляет магазин");
         return mav;
     }
     @PostMapping("/saveShop")
@@ -64,10 +69,11 @@ public class ShopController {
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
         shop.setUser(currentUser);
         shopRepository.save(shop);
+        userActionService.logUserAction(currentUser,"сохранил книгу: "+shop.getTitle());
         return "redirect:/list-shops";
     }
     @GetMapping("/showUpdateShopForm")
-    public ModelAndView showUpdateForm (@RequestParam Long shopId) {
+    public ModelAndView showUpdateForm (@RequestParam Long shopId, @AuthenticationPrincipal UserDetails userDetails) {
         ModelAndView mav = new ModelAndView("add-shop-form");
         Optional<Shop> optionalShop = shopRepository.findById(shopId);
         Shop shop = new Shop();
@@ -75,10 +81,17 @@ public class ShopController {
             shop = optionalShop.get();
         }
         mav.addObject("shop", shop);
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+        userActionService.logUserAction(currentUser,
+                "Изменил магазин: "+shopRepository.findById(shopId).get().getTitle());
         return mav;
     }
        @GetMapping("/deleteShop")
-    public String deleteShop(@RequestParam Long shopId) {
+    public String deleteShop(@RequestParam Long shopId, @AuthenticationPrincipal UserDetails userDetails) {
+           //запись действия
+           User currentUser = userRepository.findByEmail(userDetails.getUsername());
+           userActionService.logUserAction(currentUser,
+                   "Удалил книгу: "+shopRepository.findById(shopId).get().getTitle());
         shopRepository.deleteById(shopId);
         return "redirect:/list-shops";
     }

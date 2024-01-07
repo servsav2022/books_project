@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 >
 <head>
     <meta charset="UTF-8">
@@ -84,7 +85,10 @@
                  #authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="nav-link" th:href="@{/users}">Users</a>
                 </li>
-
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()') and
+                #authorization.expression('hasRole(''ADMIN'')')}">
+                <a class="nav-link" th:href="@{/users-actions}">Logs</a>
+                </li>
                 <!-- Если аутентификация не выполнена, показать ссылки на вход и регистрацию -->
                 <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link" th:href="@{/login}">Login</a>
