@@ -64,6 +64,45 @@ public class BookController {
         userActionService.logUserAction(currentUser, "Просмотрел список книг: ");
         return mav;
     }
+    @GetMapping("/priceallbooks")
+    public ModelAndView priceAllBooks(@AuthenticationPrincipal UserDetails userDetails){
+
+        log.info(userDetails.getUsername());
+        ModelAndView mav = new ModelAndView("priceallbooks");
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+        Role role = roleRepository.findByName("USER");
+        if (role == currentUser.getRoles().get(0)) {
+            List<Book> userBooks = currentUser.getBooks();
+            mav.addObject("books", userBooks);
+            double totalPrice = userBooks.stream()
+                    .mapToDouble(book -> book.getPriceBook().getPrice())
+                    .sum();
+            mav.addObject("totalPrice",totalPrice);
+        }
+        role = roleRepository.findByName("ROLE_ADMIN");
+
+        if (role == currentUser.getRoles().get(0)) {
+            List<Book> userBooks = bookRepository.findAll();
+            mav.addObject("books", userBooks);
+            double totalPrice = userBooks.stream()
+                    .mapToDouble(book -> book.getPriceBook().getPrice())
+                    .sum();
+            mav.addObject("totalPrice",totalPrice);
+        }
+
+        role = roleRepository.findByName("READ_ONLY");
+        if (role == currentUser.getRoles().get(0)) {
+            List<Book> userBooks = currentUser.getBooks();
+            mav.addObject("books", userBooks);
+            double totalPrice = userBooks.stream()
+                    .mapToDouble(book -> book.getPriceBook().getPrice())
+                    .sum();
+            mav.addObject("totalPrice",totalPrice);
+        }
+        userActionService.logUserAction(currentUser, "Просмотрел цену своих книг: ");
+        return mav;
+    }
+
     @GetMapping("/addBookForm")
     public ModelAndView addBookForm(@AuthenticationPrincipal UserDetails userDetails) {
         User currentUser = userRepository.findByEmail(userDetails.getUsername());

@@ -111,12 +111,7 @@
 <div class="container col-md-6">
 
     <hr/>
-    <div sec:authorize="!hasAuthority('READ_ONLY')">
-        <a th:href="@{/addBookForm}" class="btn btn-primary">Добавить книгу</a>
-        <a th:href="@{/priceallbooks}" class="btn btn-primary">Расчитать общую стоимость</a>
-    </div>
-
-    <br/><br/>
+    <br/>
     <table class="table table-bordered table-striped" id="bookTable">
         <thead>
         <tr>
@@ -134,12 +129,15 @@
             <td th:text="${book.year}" />
             <td th:text="${book.pageCount}"/>
             <td th:text="${book.getPriceBook().getPrice()}"/>
-            <td>
-                <div sec:authorize="!hasAuthority('READ_ONLY')">
-                <a th:href="@{/showUpdateForm(bookId=${book.id})}" class="btn btn-info">Обновить</a>
-                    <a th:href="@{/deleteBook(bookId=${book.id})}" class="btn btn-danger ml-2">Удалить</a>
-                </div>
-            </td>
+        </tr>
+        </tbody>
+        <tbody>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Общая стоимость:</th>
+            <th th:text="${totalPrice}"></th>
         </tr>
         </tbody>
     </table>
